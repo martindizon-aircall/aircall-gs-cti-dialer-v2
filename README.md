@@ -10,7 +10,7 @@ This is possible because Aircall has a broad and well-document public REST API! 
 
 But please keep in mind the following:
 
-- Installation only needs to be performed once — after, the agent can use the application as many times as they want (without needing to install again)
-- In order for the script to understand which Aircall User is performing the action, one variable need to be modified in Code.gs
-  - This variable will keep track of each Google email address and its associated Aircall User ID
+- Installation only needs to be performed once — after, any agent can use the application as many times as they want (without needing to install again)
+- In order for the script to understand which Aircall User is performing the action in the shared spreadsheet, a new tab (which could be hidden) must be opened with the name "Aircall User IDs"
+  - Column A of this new tab should be the Google Sheet's User Email, and column B should be the associated Aircall User ID
 - The application will only recognize numbers that are in the International E.164 phone number format (e.g. +46 for Swedish phone numbers)
