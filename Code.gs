@@ -5,13 +5,6 @@ const DISPLAY_AIRCALL_CTI = "displayAircallCTI";
 const CLICK_TO_DIAL = "clickToDial";
 const CREATE_DIALER_CAMPAIGN = "createDialerCampaign";
 
-// List of GS User Emails and their associated Aircall User IDs
-const AIRCALL_USER_IDS = {
-  "user1@gmail.com": "111111",
-  "user2@gmail.com": "222222",
-  "user3@gmail.com": "333333"
-};
-
 /*
   Function to call when the spreadsheet opens, which sets up the environment.
  */
@@ -23,6 +16,30 @@ function onOpen(e) {
     .addItem('Click-to-Dial', CLICK_TO_DIAL)
     .addItem('Create Dialer Campaign', CREATE_DIALER_CAMPAIGN)
     .addToUi();
+
+  let AIRCALL_USER_IDS = {};
+
+  // Retrieve the values from cells containing Google Sheet emails and their
+  // associated Aircall User IDs
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let allEmailsIDs = ss.getRange("Aircall User IDs!A1:B200").getValues();
+
+  // For each row...
+  for (var i = 0; i < allEmailsIDs.length; i++) {
+    // Retrieve the Google Sheet email and its associated Aircall User ID
+    if (allEmailsIDs[i][0] && allEmailsIDs[i][1]) {
+      AIRCALL_USER_IDS[allEmailsIDs[i][0]] = allEmailsIDs[i][1];
+    }
+  }
+
+  // Upload to global script properties so it can be used later in another function
+  // when it is called
+  try {
+    const scriptProperties = PropertiesService.getScriptProperties();
+    scriptProperties.setProperty('AIRCALL_USER_IDS', JSON.stringify(AIRCALL_USER_IDS));
+  } catch (err) {
+    Logger.log('onOpen(): Failed setting up API with error: %s', err.message);
+  }
 }
 
 /*
@@ -120,6 +137,7 @@ async function aircallAPIRequest(request_type, verb, payload, success_code) {
     const baseUrl = scriptProperties.getProperty('BASE_URL');
     const apiID = scriptProperties.getProperty('API_ID');
     const apiToken = scriptProperties.getProperty('API_TOKEN');
+    const AIRCALL_USER_IDS = JSON.parse(scriptProperties.getProperty('AIRCALL_USER_IDS'));
     
     // Retrieve the current GS User's Aircall User ID
     const userEmail = Session.getActiveUser();
